@@ -10,8 +10,10 @@ const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 const cors_2 = require("./config/cors");
 const env_1 = require("./config/env");
+const upload_1 = require("./config/upload");
 const rate_limit_middleware_1 = require("./middleware/rate-limit.middleware");
 const not_found_middleware_1 = require("./middleware/not-found.middleware");
 const error_middleware_1 = require("./middleware/error.middleware");
@@ -37,9 +39,16 @@ function createApp() {
     app.use(express_1.default.json({ limit: '10mb' }));
     app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
     app.use((0, cookie_parser_1.default)(env_1.env.COOKIE_SECRET));
-    // 6. Static files for uploads (VPS disk storage)
-    const uploadsPath = path_1.default.join(process.cwd(), 'public', 'uploads');
-    app.use('/uploads', express_1.default.static(uploadsPath));
+    // 6. Static files for uploads
+    app.use('/uploads', express_1.default.static(upload_1.uploadBase));
+    const localUploadsPath = path_1.default.join(process.cwd(), 'public', 'uploads');
+    if (localUploadsPath !== upload_1.uploadBase && fs_1.default.existsSync(localUploadsPath)) {
+        app.use('/uploads', express_1.default.static(localUploadsPath));
+    }
+    const serverUploadsPath = path_1.default.join(process.cwd(), 'server', 'public', 'uploads');
+    if (serverUploadsPath !== upload_1.uploadBase && fs_1.default.existsSync(serverUploadsPath)) {
+        app.use('/uploads', express_1.default.static(serverUploadsPath));
+    }
     // 7. Base API route
     app.get('/', (_req, res) => {
         res.json({

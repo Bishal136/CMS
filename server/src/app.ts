@@ -4,9 +4,11 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import fs from 'fs';
 
 import { corsOptions } from './config/cors';
 import { env } from './config/env';
+import { uploadBase } from './config/upload';
 import { globalRateLimiter } from './middleware/rate-limit.middleware';
 import { notFoundHandler } from './middleware/not-found.middleware';
 import { errorHandler } from './middleware/error.middleware';
@@ -42,9 +44,18 @@ export function createApp(): Application {
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use(cookieParser(env.COOKIE_SECRET));
 
-  // 6. Static files for uploads (VPS disk storage)
-  const uploadsPath = path.join(process.cwd(), 'public', 'uploads');
-  app.use('/uploads', express.static(uploadsPath));
+  // 6. Static files for uploads
+  app.use('/uploads', express.static(uploadBase));
+
+  const localUploadsPath = path.join(process.cwd(), 'public', 'uploads');
+  if (localUploadsPath !== uploadBase && fs.existsSync(localUploadsPath)) {
+    app.use('/uploads', express.static(localUploadsPath));
+  }
+
+  const serverUploadsPath = path.join(process.cwd(), 'server', 'public', 'uploads');
+  if (serverUploadsPath !== uploadBase && fs.existsSync(serverUploadsPath)) {
+    app.use('/uploads', express.static(serverUploadsPath));
+  }
 
   // 7. Base API route
   app.get('/', (_req, res) => {
