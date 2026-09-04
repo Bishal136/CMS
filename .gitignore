@@ -6,7 +6,6 @@ PRD.md
 rule.md
 .env
 node_modules/
-dist/
 **/node_modules/
-**/dist/
+client/dist/
 *.tsbuildinfo
