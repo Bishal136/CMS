@@ -1,10 +1,13 @@
 export interface IUser {
-  id: string;
+  id?: string;
+  _id?: string;
   name: string;
   email: string;
+  backupEmail?: string;
   avatar?: string;
   role?: string;
-  organizationId?: string;
+  organizationId?: any;
+  isVerified?: boolean;
   emailVerified?: boolean;
   twoFactorEnabled?: boolean;
 }

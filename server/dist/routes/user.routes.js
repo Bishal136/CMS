@@ -12,5 +12,6 @@ router.use(auth_middleware_1.authenticate);
 router.get('/profile', user_controller_1.UserController.getProfile);
 router.put('/profile', (0, validate_middleware_1.validate)(user_validator_1.updateProfileSchema), user_controller_1.UserController.updateProfile);
 router.put('/password', (0, validate_middleware_1.validate)(auth_validator_1.updatePasswordSchema), user_controller_1.UserController.updatePassword);
+router.post('/resend-verification', user_controller_1.UserController.resendVerification);
 exports.userRoutes = router;
 //# sourceMappingURL=user.routes.js.map

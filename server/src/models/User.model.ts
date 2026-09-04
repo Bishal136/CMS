@@ -18,6 +18,12 @@ const userSchema = new Schema<IUserDocument>(
       trim: true,
       index: true,
     },
+    backupEmail: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      default: '',
+    },
     password: {
       type: String,
       select: false, // Don't return password in queries by default

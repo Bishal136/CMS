@@ -3,7 +3,10 @@ import { z } from 'zod';
 export const updateProfileSchema = z.object({
   body: z.object({
     name: z.string().min(2).max(100).optional(),
-    avatar: z.string().url().optional().or(z.literal('')),
+    email: z.string().email('Invalid email address').optional(),
+    backupEmail: z.string().email('Invalid backup email').optional().or(z.literal('')),
+    avatar: z.string().optional(),
+    twoFactorEnabled: z.boolean().optional(),
     preferences: z
       .object({
         theme: z.enum(['light', 'dark', 'system']).optional(),

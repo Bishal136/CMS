@@ -19,6 +19,7 @@ export interface IUserDocument extends Document {
   _id: Types.ObjectId;
   name: string;
   email: string;
+  backupEmail?: string;
   password?: string;
   avatar?: string;
   role: 'admin' | 'user';

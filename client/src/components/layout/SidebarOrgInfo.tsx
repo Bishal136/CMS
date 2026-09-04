@@ -28,8 +28,16 @@ export const SidebarOrgInfo: React.FC<ISidebarOrgInfoProps> = ({
         className="w-full flex items-center justify-between gap-2.5 p-1.5 rounded-xl hover:bg-neutral-100 transition-colors text-left cursor-pointer group"
       >
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-[#3F51B5] text-white flex items-center justify-center shrink-0 shadow-2xs">
-            <User size={16} />
+          <div className="w-8 h-8 rounded-lg bg-[#3F51B5] text-white flex items-center justify-center shrink-0 shadow-2xs overflow-hidden">
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={user.name || 'User'}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <User size={16} />
+            )}
           </div>
           <div className="min-w-0">
             <p className="text-xs font-bold text-neutral-900 truncate leading-tight">

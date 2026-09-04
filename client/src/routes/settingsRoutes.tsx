@@ -1,5 +1,4 @@
 import { RouteObject, Navigate } from 'react-router-dom';
-import { AppLayout } from '@/components/layout/AppLayout';
 import { SettingsLayout } from '@/components/layout/SettingsLayout';
 import { ProfilePage } from '@/features/settings/pages/ProfilePage';
 import { PreferencesPage } from '@/features/settings/pages/PreferencesPage';
@@ -15,13 +14,10 @@ import { RoleGuard } from '@/components/common/RoleGuard';
 
 export const settingsRoutes: RouteObject = {
   path: '/settings',
-  element: <AppLayout />,
+  element: <SettingsLayout />,
   children: [
-    {
-      element: <SettingsLayout />,
-      children: [
-        { index: true, element: <Navigate to="/settings/profile" replace /> },
-        { path: 'profile', element: <ProfilePage /> },
+    { index: true, element: <Navigate to="/settings/profile" replace /> },
+    { path: 'profile', element: <ProfilePage /> },
         { path: 'preferences', element: <PreferencesPage /> },
         { path: 'notifications', element: <NotificationsPage /> },
         { path: 'general', element: <GeneralPage /> },
@@ -52,8 +48,6 @@ export const settingsRoutes: RouteObject = {
           ),
         },
         { path: 'saved-replies', element: <SavedRepliesPage /> },
-      ],
-    },
   ],
 };
 

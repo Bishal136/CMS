@@ -22,4 +22,9 @@ export class UserController {
     );
     return ApiResponse.success(res, null, 'Password changed successfully');
   });
+
+  static resendVerification = catchAsync(async (req: Request, res: Response) => {
+    const result = await UserService.resendVerification(req.user!._id.toString());
+    return ApiResponse.success(res, result, 'Verification email sent successfully');
+  });
 }

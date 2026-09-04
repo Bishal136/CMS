@@ -61,6 +61,12 @@ export const authSlice = createSlice({
       localStorage.removeItem('access_token');
       localStorage.removeItem('cms_user');
     },
+    updateUser: (state, action: PayloadAction<Partial<IUser>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+        localStorage.setItem('cms_user', JSON.stringify(state.user));
+      }
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
@@ -70,5 +76,5 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logoutUser, setLoading, setError } = authSlice.actions;
+export const { setCredentials, logoutUser, updateUser, setLoading, setError } = authSlice.actions;
 export default authSlice.reducer;

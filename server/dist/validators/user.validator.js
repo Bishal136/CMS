@@ -5,7 +5,10 @@ const zod_1 = require("zod");
 exports.updateProfileSchema = zod_1.z.object({
     body: zod_1.z.object({
         name: zod_1.z.string().min(2).max(100).optional(),
-        avatar: zod_1.z.string().url().optional().or(zod_1.z.literal('')),
+        email: zod_1.z.string().email('Invalid email address').optional(),
+        backupEmail: zod_1.z.string().email('Invalid backup email').optional().or(zod_1.z.literal('')),
+        avatar: zod_1.z.string().optional(),
+        twoFactorEnabled: zod_1.z.boolean().optional(),
         preferences: zod_1.z
             .object({
             theme: zod_1.z.enum(['light', 'dark', 'system']).optional(),

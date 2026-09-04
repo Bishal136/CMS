@@ -17,6 +17,10 @@ class UserController {
         await user_service_1.UserService.updatePassword(req.user._id.toString(), req.body.currentPassword, req.body.newPassword);
         return ApiResponse_1.ApiResponse.success(res, null, 'Password changed successfully');
     });
+    static resendVerification = (0, catchAsync_1.catchAsync)(async (req, res) => {
+        const result = await user_service_1.UserService.resendVerification(req.user._id.toString());
+        return ApiResponse_1.ApiResponse.success(res, result, 'Verification email sent successfully');
+    });
 }
 exports.UserController = UserController;
 //# sourceMappingURL=user.controller.js.map

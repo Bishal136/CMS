@@ -58,7 +58,7 @@ async function seedDemoUser() {
     // ==========================================
     // 2. Seed / Update Regular User
     // ==========================================
-    const userEmail = 'user@cmsmanagement.com';
+    const userEmail = 'user1@gmail.com';
     let regularUser = await User_model_1.User.findOne({ email: userEmail });
     if (!regularUser) {
         const tempOwnerId = new mongoose_1.Types.ObjectId();
@@ -72,7 +72,7 @@ async function seedDemoUser() {
         regularUser = await User_model_1.User.create({
             name: 'Demo Creator User',
             email: userEmail,
-            password: 'Password123!', // pre-save hook will hash with bcrypt
+            password: '12345678', // pre-save hook will hash with bcrypt
             role: 'user',
             organizationId: userOrg._id,
             isVerified: true,
@@ -90,13 +90,13 @@ async function seedDemoUser() {
             plan: 'free',
             status: 'active',
         });
-        console.log(`✅ Regular User created: ${userEmail} | Role: user (Password: Password123!)`);
+        console.log(`✅ Regular User created: ${userEmail} | Role: user (Password: 12345678)`);
     }
     else {
         // Ensure existing user has role: 'user'
         regularUser.role = 'user';
         regularUser.isVerified = true;
-        regularUser.password = 'Password123!';
+        regularUser.password = '12345678';
         await regularUser.save();
         await Organization_model_1.Organization.updateOne({ _id: regularUser.organizationId }, { plan: 'free', channelLimit: 3, postLimitPerChannel: 20 });
         await Subscription_model_1.Subscription.findOneAndUpdate({ organizationId: regularUser.organizationId }, { plan: 'free', status: 'active' }, { upsert: true });

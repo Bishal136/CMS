@@ -12,5 +12,6 @@ router.use(authenticate);
 router.get('/profile', UserController.getProfile);
 router.put('/profile', validate(updateProfileSchema), UserController.updateProfile);
 router.put('/password', validate(updatePasswordSchema), UserController.updatePassword);
+router.post('/resend-verification', UserController.resendVerification);
 
 export const userRoutes = router;
