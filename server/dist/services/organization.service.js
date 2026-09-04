@@ -33,7 +33,7 @@ class OrganizationService {
         const member = await User_model_1.User.create({
             name: data.name,
             email: data.email.toLowerCase(),
-            role: data.role || 'member',
+            role: data.role || 'user',
             organizationId,
             isVerified: true,
             password: 'TempPassword123!', // Can be reset by user

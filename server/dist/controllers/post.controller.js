@@ -22,6 +22,10 @@ class PostController {
         const { posts, total } = await post_service_1.PostService.listPosts(req.organizationId, filter, pagination);
         return ApiResponse_1.ApiResponse.paginated(res, posts, pagination.page, pagination.limit, total, 'Posts retrieved successfully');
     });
+    static getPostCounts = (0, catchAsync_1.catchAsync)(async (req, res) => {
+        const counts = await post_service_1.PostService.getPostCounts(req.organizationId);
+        return ApiResponse_1.ApiResponse.success(res, counts, 'Post counts retrieved successfully');
+    });
     static getPost = (0, catchAsync_1.catchAsync)(async (req, res) => {
         const post = await post_service_1.PostService.getPost(req.params.id, req.organizationId);
         return ApiResponse_1.ApiResponse.success(res, post);

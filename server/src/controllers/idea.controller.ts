@@ -36,4 +36,15 @@ export class IdeaController {
     const group = await IdeaService.createGroup(req.organizationId!, req.body.name);
     return ApiResponse.created(res, group, 'Group created successfully');
   });
+
+  static generateIdeas = catchAsync(async (req: Request, res: Response) => {
+    const { topic, count } = req.body;
+    const ideas = await IdeaService.generateIdeas(
+      req.user!._id.toString(),
+      req.organizationId!,
+      topic,
+      count || 3
+    );
+    return ApiResponse.created(res, ideas, 'Ideas generated successfully');
+  });
 }

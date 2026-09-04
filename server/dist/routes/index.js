@@ -18,6 +18,7 @@ const saved_reply_routes_1 = require("./saved-reply.routes");
 const notification_routes_1 = require("./notification.routes");
 const billing_routes_1 = require("./billing.routes");
 const upload_routes_1 = require("./upload.routes");
+const home_routes_1 = require("./home.routes");
 const ApiResponse_1 = require("../utils/ApiResponse");
 const apiRouter = (0, express_1.Router)();
 // Health check endpoint
@@ -46,5 +47,6 @@ apiRouter.use('/saved-replies', saved_reply_routes_1.savedReplyRoutes);
 apiRouter.use('/notifications', notification_routes_1.notificationRoutes);
 apiRouter.use('/billing', billing_routes_1.billingRoutes);
 apiRouter.use('/upload', upload_routes_1.uploadRoutes);
+apiRouter.use('/home', home_routes_1.homeRoutes);
 exports.default = apiRouter;
 //# sourceMappingURL=index.js.map

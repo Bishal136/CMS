@@ -20,4 +20,5 @@ export interface IAuthResponse {
     organizationId: string;
   };
   tokens: IAuthTokens;
+  accessToken?: string;
 }

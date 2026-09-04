@@ -27,6 +27,10 @@ const ideaSchema = new Schema<IIdeaDocument>(
       type: Number,
       default: 0,
     },
+    previewIllustration: {
+      type: String,
+      default: '',
+    },
     tagIds: [
       {
         type: Schema.Types.ObjectId,

@@ -14,6 +14,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', PostController.listPosts);
+router.get('/counts', PostController.getPostCounts);
 router.get('/:id', PostController.getPost);
 router.post('/', validate(createPostSchema), PostController.createPost);
 router.put('/:id', validate(updatePostSchema), PostController.updatePost);
@@ -24,7 +25,7 @@ router.post('/:id/publish', PostController.publishNow);
 router.post('/:id/submit-approval', PostController.submitApproval);
 router.post(
   '/:id/review-approval',
-  requireRole('admin', 'publisher'),
+  requireRole('admin'),
   validate(approvalActionSchema),
   PostController.reviewApproval
 );

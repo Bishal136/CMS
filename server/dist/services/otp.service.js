@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OtpService = void 0;
 const crypto_1 = __importDefault(require("crypto"));
 const Otp_model_1 = require("../models/Otp.model");
+const User_model_1 = require("../models/User.model");
 const AppError_1 = require("../utils/AppError");
 const env_1 = require("../config/env");
 class OtpService {
@@ -14,6 +15,12 @@ class OtpService {
      */
     static async sendOtp(email, type = 'register') {
         const cleanEmail = email.toLowerCase().trim();
+        if (type === 'register') {
+            const existingUser = await User_model_1.User.findOne({ email: cleanEmail });
+            if (existingUser) {
+                throw AppError_1.AppError.conflict('An account with this email already exists. Please log in.');
+            }
+        }
         // Generate 6-digit numeric OTP
         const otpCode = crypto_1.default.randomInt(100000, 1000000).toString();
         // Expiration: 10 minutes from now

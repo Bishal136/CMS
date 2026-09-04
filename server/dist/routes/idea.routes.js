@@ -11,6 +11,7 @@ router.use(auth_middleware_1.authenticate);
 router.get('/', idea_controller_1.IdeaController.listIdeas);
 router.post('/', (0, validate_middleware_1.validate)(idea_validator_1.createIdeaSchema), idea_controller_1.IdeaController.createIdea);
 router.post('/groups', idea_controller_1.IdeaController.createGroup);
+router.post('/generate', idea_controller_1.IdeaController.generateIdeas);
 router.put('/:id', (0, validate_middleware_1.validate)(idea_validator_1.updateIdeaSchema), idea_controller_1.IdeaController.updateIdea);
 router.delete('/:id', idea_controller_1.IdeaController.deleteIdea);
 exports.ideaRoutes = router;

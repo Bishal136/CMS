@@ -28,6 +28,15 @@ async function startServer() {
     `);
   });
 
+  server.on('error', (error: NodeJS.ErrnoException) => {
+    if (error.code === 'EADDRINUSE') {
+      console.error(`❌ Port ${env.PORT} is already in use. Please terminate the existing process or set a different PORT in .env.`);
+    } else {
+      console.error('❌ Server startup error:', error);
+    }
+    process.exit(1);
+  });
+
   // 5. Graceful shutdown handler
   const shutdown = async (signal: string) => {
     console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);

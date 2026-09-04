@@ -60,6 +60,10 @@ const ideaSchema = new mongoose_1.Schema({
         type: Number,
         default: 0,
     },
+    previewIllustration: {
+        type: String,
+        default: '',
+    },
     tagIds: [
         {
             type: mongoose_1.Schema.Types.ObjectId,

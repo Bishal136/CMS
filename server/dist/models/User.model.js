@@ -64,8 +64,8 @@ const userSchema = new mongoose_1.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'member', 'publisher'],
-        default: 'member',
+        enum: ['admin', 'user'],
+        default: 'user',
         index: true,
     },
     organizationId: {

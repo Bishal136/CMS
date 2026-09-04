@@ -23,6 +23,8 @@ router.post('/send-otp', authRateLimiter, validate(sendOtpSchema), AuthControlle
 router.post('/register-otp', authRateLimiter, validate(registerWithOtpSchema), AuthController.registerWithOtp);
 
 // Google OAuth Login / Registration
+router.get('/google', AuthController.googleOAuthRedirect);
+router.get('/google/callback', AuthController.googleOAuthCallback);
 router.post('/google', authRateLimiter, validate(googleLoginSchema), AuthController.googleLogin);
 
 // Token Management & Passwords

@@ -15,7 +15,57 @@ const DEFAULT_SCHEDULE = [
 ];
 class ChannelService {
     static async listChannels(organizationId) {
-        return Channel_model_1.Channel.find({ organizationId, isConnected: true }).select('platform profile postingSchedule createdAt updatedAt');
+        let channels = await Channel_model_1.Channel.find({ organizationId, isConnected: true }).select('platform profile postingSchedule createdAt updatedAt');
+        if (channels.length === 0) {
+            try {
+                await Channel_model_1.Channel.create([
+                    {
+                        platform: 'instagram',
+                        accessToken: 'demo_ig_token',
+                        refreshToken: 'demo_ig_refresh',
+                        profile: {
+                            name: 'Instagram Channel',
+                            handle: '@demo_instagram',
+                            avatar: '',
+                        },
+                        postingSchedule: DEFAULT_SCHEDULE,
+                        organizationId,
+                        isConnected: true,
+                    },
+                    {
+                        platform: 'facebook',
+                        accessToken: 'demo_fb_token',
+                        refreshToken: 'demo_fb_refresh',
+                        profile: {
+                            name: 'Facebook Page',
+                            handle: '@demo_facebook',
+                            avatar: '',
+                        },
+                        postingSchedule: DEFAULT_SCHEDULE,
+                        organizationId,
+                        isConnected: true,
+                    },
+                    {
+                        platform: 'linkedin',
+                        accessToken: 'demo_li_token',
+                        refreshToken: 'demo_li_refresh',
+                        profile: {
+                            name: 'LinkedIn Profile',
+                            handle: '@demo_linkedin',
+                            avatar: '',
+                        },
+                        postingSchedule: DEFAULT_SCHEDULE,
+                        organizationId,
+                        isConnected: true,
+                    },
+                ]);
+                channels = await Channel_model_1.Channel.find({ organizationId, isConnected: true }).select('platform profile postingSchedule createdAt updatedAt');
+            }
+            catch {
+                // Ignore duplicate seeding collision
+            }
+        }
+        return channels;
     }
     static async getChannel(channelId, organizationId) {
         const channel = await Channel_model_1.Channel.findOne({ _id: channelId, organizationId, isConnected: true });

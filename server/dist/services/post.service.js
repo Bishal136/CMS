@@ -78,6 +78,20 @@ class PostService {
         ]);
         return { posts, total };
     }
+    static async getPostCounts(organizationId) {
+        const [queue, drafts, approvals, sent] = await Promise.all([
+            Post_model_1.Post.countDocuments({ organizationId, status: 'queued' }),
+            Post_model_1.Post.countDocuments({ organizationId, status: 'draft' }),
+            Post_model_1.Post.countDocuments({ organizationId, status: { $in: ['pending-approval', 'approved'] } }),
+            Post_model_1.Post.countDocuments({ organizationId, status: 'sent' }),
+        ]);
+        return {
+            queue,
+            drafts,
+            approvals,
+            sent,
+        };
+    }
     static async getPost(postId, organizationId) {
         const post = await Post_model_1.Post.findOne({ _id: postId, organizationId })
             .populate('channelIds', 'platform profile')

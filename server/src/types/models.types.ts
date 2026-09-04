@@ -21,7 +21,7 @@ export interface IUserDocument extends Document {
   email: string;
   password?: string;
   avatar?: string;
-  role: 'admin' | 'member' | 'publisher';
+  role: 'admin' | 'user';
   organizationId: Types.ObjectId;
   preferences: IUserPreferences;
   twoFactorSecret?: string;
@@ -115,6 +115,7 @@ export interface IIdeaDocument extends Document {
   status: 'unassigned' | 'todo' | 'in-progress' | 'done';
   groupName?: string;
   order: number;
+  previewIllustration?: string;
   tagIds: Types.ObjectId[];
   organizationId: Types.ObjectId;
   createdBy: Types.ObjectId;

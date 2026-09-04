@@ -8,6 +8,7 @@ export class TemplateController {
     const filter = {
       category: req.query.category as string | undefined,
       isPersonal: req.query.isPersonal ? req.query.isPersonal === 'true' : undefined,
+      search: req.query.search as string | undefined,
     };
     const templates = await TemplateService.listTemplates(req.organizationId!, filter);
     return ApiResponse.success(res, templates);

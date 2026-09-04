@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { Otp } from '../models/Otp.model';
+import { User } from '../models/User.model';
 import { AppError } from '../utils/AppError';
 import { env } from '../config/env';
 
@@ -12,6 +13,13 @@ export class OtpService {
     type: 'register' | 'reset-password' | 'login' = 'register'
   ): Promise<{ message: string; otp?: string }> {
     const cleanEmail = email.toLowerCase().trim();
+
+    if (type === 'register') {
+      const existingUser = await User.findOne({ email: cleanEmail });
+      if (existingUser) {
+        throw AppError.conflict('An account with this email already exists. Please log in.');
+      }
+    }
 
     // Generate 6-digit numeric OTP
     const otpCode = crypto.randomInt(100000, 1000000).toString();

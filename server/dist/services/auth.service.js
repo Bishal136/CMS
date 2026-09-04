@@ -37,12 +37,13 @@ class AuthService {
             channelLimit: 3,
             postLimitPerChannel: 10,
         });
-        // 2. Create User as organization owner/admin
+        // 2. Create User (defaults to role: 'user')
+        const userRole = data.role || 'user';
         const user = new User_model_1.User({
             name: data.name,
             email: data.email.toLowerCase(),
             password: data.password,
-            role: 'admin',
+            role: userRole,
             organizationId: org._id,
             isVerified: true,
             authProvider: 'local',
@@ -81,6 +82,7 @@ class AuthService {
                 organizationId: org._id.toString(),
             },
             tokens,
+            accessToken: tokens.accessToken,
         };
     }
     /**
@@ -102,7 +104,7 @@ class AuthService {
      * Verifies Google token with Google's tokeninfo API, then provisions or logs in the user.
      */
     static async googleAuth(token) {
-        let googleUser;
+        let googleUser = null;
         // Handle mock tokens for dev and testing
         if (token.startsWith('mock-google-') || token.startsWith('mock-token-')) {
             const parts = token.split(':');
@@ -118,19 +120,47 @@ class AuthService {
             };
         }
         else {
+            let verified = false;
+            // 1. Try Google tokeninfo endpoint (for ID token / JWT)
             try {
                 const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(token)}`);
                 const data = (await response.json());
-                if (!response.ok || data.error_description || !data.email) {
-                    throw AppError_1.AppError.unauthorized(data.error_description || 'Failed to verify Google token');
+                if (response.ok && data.email) {
+                    googleUser = data;
+                    verified = true;
                 }
-                googleUser = data;
             }
-            catch (err) {
-                if (err instanceof AppError_1.AppError)
-                    throw err;
-                throw AppError_1.AppError.unauthorized('Unable to contact Google OAuth service');
+            catch {
+                // continue to try userinfo endpoint
             }
+            // 2. Try Google userinfo endpoint (for OAuth access token, e.g., ya29...)
+            if (!verified) {
+                try {
+                    const userinfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    const data = (await userinfoRes.json());
+                    if (userinfoRes.ok && data.email) {
+                        googleUser = {
+                            sub: data.sub,
+                            email: data.email,
+                            name: data.name || data.email.split('@')[0],
+                            picture: data.picture,
+                            email_verified: data.email_verified,
+                        };
+                        verified = true;
+                    }
+                }
+                catch {
+                    // handled below
+                }
+            }
+            if (!verified || !googleUser) {
+                throw AppError_1.AppError.unauthorized('Invalid or expired Google authentication token');
+            }
+        }
+        if (!googleUser) {
+            throw AppError_1.AppError.unauthorized('Failed to obtain Google profile information');
         }
         const email = googleUser.email.toLowerCase().trim();
         // Find existing user by googleId or email
@@ -154,7 +184,7 @@ class AuthService {
                 googleId: googleUser.sub,
                 authProvider: 'google',
                 avatar: googleUser.picture || '',
-                role: 'admin',
+                role: 'user',
                 organizationId: org._id,
                 isVerified: true,
             });
@@ -213,6 +243,7 @@ class AuthService {
                 organizationId,
             },
             tokens,
+            accessToken: tokens.accessToken,
         };
     }
     static async login(data) {
@@ -248,6 +279,7 @@ class AuthService {
                 organizationId: user.organizationId.toString(),
             },
             tokens,
+            accessToken: tokens.accessToken,
         };
     }
     static async refreshTokens(currentRefreshToken) {

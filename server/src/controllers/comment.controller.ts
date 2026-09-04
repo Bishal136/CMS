@@ -30,10 +30,11 @@ export class CommentController {
   });
 
   static replyToComment = catchAsync(async (req: Request, res: Response) => {
+    const content = req.body.content || req.body.text || '';
     const comment = await CommentService.replyToComment(
       req.params.id,
       req.organizationId!,
-      req.body.content
+      content
     );
     return ApiResponse.success(res, comment, 'Replied to comment successfully');
   });

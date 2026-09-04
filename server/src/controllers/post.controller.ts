@@ -40,6 +40,11 @@ export class PostController {
     );
   });
 
+  static getPostCounts = catchAsync(async (req: Request, res: Response) => {
+    const counts = await PostService.getPostCounts(req.organizationId!);
+    return ApiResponse.success(res, counts, 'Post counts retrieved successfully');
+  });
+
   static getPost = catchAsync(async (req: Request, res: Response) => {
     const post = await PostService.getPost(req.params.id, req.organizationId!);
     return ApiResponse.success(res, post);

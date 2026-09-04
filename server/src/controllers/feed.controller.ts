@@ -26,4 +26,12 @@ export class FeedController {
     );
     return ApiResponse.success(res, items);
   });
+
+  static refreshFeed = catchAsync(async (req: Request, res: Response) => {
+    const items = await FeedService.refreshFeed(
+      req.organizationId!,
+      (req.params.id || req.query.feedId) as string | undefined
+    );
+    return ApiResponse.success(res, items, 'Feed refreshed successfully');
+  });
 }

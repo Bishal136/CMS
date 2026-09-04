@@ -3,8 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SOCIAL_PLATFORMS = exports.POST_STATUSES = exports.PLAN_LIMITS = exports.SUBSCRIPTION_PLANS = exports.USER_ROLES = void 0;
 exports.USER_ROLES = {
     ADMIN: 'admin',
-    MEMBER: 'member',
-    PUBLISHER: 'publisher',
+    USER: 'user',
 };
 exports.SUBSCRIPTION_PLANS = {
     FREE: 'free',

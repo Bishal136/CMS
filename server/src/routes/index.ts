@@ -16,6 +16,7 @@ import { savedReplyRoutes } from './saved-reply.routes';
 import { notificationRoutes } from './notification.routes';
 import { billingRoutes } from './billing.routes';
 import { uploadRoutes } from './upload.routes';
+import { homeRoutes } from './home.routes';
 import { ApiResponse } from '../utils/ApiResponse';
 
 const apiRouter = Router();
@@ -51,5 +52,6 @@ apiRouter.use('/saved-replies', savedReplyRoutes);
 apiRouter.use('/notifications', notificationRoutes);
 apiRouter.use('/billing', billingRoutes);
 apiRouter.use('/upload', uploadRoutes);
+apiRouter.use('/home', homeRoutes);
 
 export default apiRouter;

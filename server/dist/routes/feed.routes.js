@@ -10,5 +10,7 @@ router.get('/', feed_controller_1.FeedController.listFeeds);
 router.post('/', feed_controller_1.FeedController.createFeed);
 router.delete('/:id', feed_controller_1.FeedController.deleteFeed);
 router.get('/items', feed_controller_1.FeedController.listFeedItems);
+router.post('/refresh', feed_controller_1.FeedController.refreshFeed);
+router.post('/:id/refresh', feed_controller_1.FeedController.refreshFeed);
 exports.feedRoutes = router;
 //# sourceMappingURL=feed.routes.js.map

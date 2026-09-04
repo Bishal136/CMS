@@ -14,6 +14,8 @@ router.post('/login', rate_limit_middleware_1.authRateLimiter, (0, validate_midd
 router.post('/send-otp', rate_limit_middleware_1.authRateLimiter, (0, validate_middleware_1.validate)(auth_validator_1.sendOtpSchema), auth_controller_1.AuthController.sendOtp);
 router.post('/register-otp', rate_limit_middleware_1.authRateLimiter, (0, validate_middleware_1.validate)(auth_validator_1.registerWithOtpSchema), auth_controller_1.AuthController.registerWithOtp);
 // Google OAuth Login / Registration
+router.get('/google', auth_controller_1.AuthController.googleOAuthRedirect);
+router.get('/google/callback', auth_controller_1.AuthController.googleOAuthCallback);
 router.post('/google', rate_limit_middleware_1.authRateLimiter, (0, validate_middleware_1.validate)(auth_validator_1.googleLoginSchema), auth_controller_1.AuthController.googleLogin);
 // Token Management & Passwords
 router.post('/refresh', auth_controller_1.AuthController.refreshToken);

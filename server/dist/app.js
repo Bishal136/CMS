@@ -21,6 +21,7 @@ function createApp() {
     // 1. Security HTTP headers
     app.use((0, helmet_1.default)({
         crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow static uploads to load in client
+        crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }, // Allow Google OAuth and auth popups
     }));
     // 2. CORS configuration
     app.use((0, cors_1.default)(cors_2.corsOptions));

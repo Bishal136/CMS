@@ -32,7 +32,7 @@ export class OrganizationService {
 
   static async inviteMember(
     organizationId: string,
-    data: { name: string; email: string; role?: 'member' | 'publisher' | 'admin' }
+    data: { name: string; email: string; role?: 'admin' | 'user' }
   ) {
     const existing = await User.findOne({ email: data.email.toLowerCase() });
     if (existing) {
@@ -42,7 +42,7 @@ export class OrganizationService {
     const member = await User.create({
       name: data.name,
       email: data.email.toLowerCase(),
-      role: data.role || 'member',
+      role: data.role || 'user',
       organizationId,
       isVerified: true,
       password: 'TempPassword123!', // Can be reset by user

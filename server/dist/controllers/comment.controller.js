@@ -17,7 +17,8 @@ class CommentController {
         return ApiResponse_1.ApiResponse.paginated(res, comments, pagination.page, pagination.limit, total, 'Comments retrieved successfully');
     });
     static replyToComment = (0, catchAsync_1.catchAsync)(async (req, res) => {
-        const comment = await comment_service_1.CommentService.replyToComment(req.params.id, req.organizationId, req.body.content);
+        const content = req.body.content || req.body.text || '';
+        const comment = await comment_service_1.CommentService.replyToComment(req.params.id, req.organizationId, content);
         return ApiResponse_1.ApiResponse.success(res, comment, 'Replied to comment successfully');
     });
     static markAsRead = (0, catchAsync_1.catchAsync)(async (req, res) => {

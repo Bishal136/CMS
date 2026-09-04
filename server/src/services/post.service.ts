@@ -111,6 +111,22 @@ export class PostService {
     return { posts, total };
   }
 
+  static async getPostCounts(organizationId: string) {
+    const [queue, drafts, approvals, sent] = await Promise.all([
+      Post.countDocuments({ organizationId, status: 'queued' }),
+      Post.countDocuments({ organizationId, status: 'draft' }),
+      Post.countDocuments({ organizationId, status: { $in: ['pending-approval', 'approved'] } }),
+      Post.countDocuments({ organizationId, status: 'sent' }),
+    ]);
+
+    return {
+      queue,
+      drafts,
+      approvals,
+      sent,
+    };
+  }
+
   static async getPost(postId: string, organizationId: string) {
     const post = await Post.findOne({ _id: postId, organizationId })
       .populate('channelIds', 'platform profile')

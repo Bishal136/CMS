@@ -21,6 +21,10 @@ class FeedController {
         const items = await feed_service_1.FeedService.listFeedItems(req.organizationId, req.query.feedId);
         return ApiResponse_1.ApiResponse.success(res, items);
     });
+    static refreshFeed = (0, catchAsync_1.catchAsync)(async (req, res) => {
+        const items = await feed_service_1.FeedService.refreshFeed(req.organizationId, (req.params.id || req.query.feedId));
+        return ApiResponse_1.ApiResponse.success(res, items, 'Feed refreshed successfully');
+    });
 }
 exports.FeedController = FeedController;
 //# sourceMappingURL=feed.controller.js.map

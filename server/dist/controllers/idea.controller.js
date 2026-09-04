@@ -25,6 +25,11 @@ class IdeaController {
         const group = await idea_service_1.IdeaService.createGroup(req.organizationId, req.body.name);
         return ApiResponse_1.ApiResponse.created(res, group, 'Group created successfully');
     });
+    static generateIdeas = (0, catchAsync_1.catchAsync)(async (req, res) => {
+        const { topic, count } = req.body;
+        const ideas = await idea_service_1.IdeaService.generateIdeas(req.user._id.toString(), req.organizationId, topic, count || 3);
+        return ApiResponse_1.ApiResponse.created(res, ideas, 'Ideas generated successfully');
+    });
 }
 exports.IdeaController = IdeaController;
 //# sourceMappingURL=idea.controller.js.map

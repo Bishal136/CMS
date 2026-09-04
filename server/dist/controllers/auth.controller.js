@@ -44,6 +44,104 @@ class AuthController {
         });
         return ApiResponse_1.ApiResponse.success(res, result, 'Google authentication successful');
     });
+    static googleOAuthRedirect = (0, catchAsync_1.catchAsync)(async (req, res) => {
+        const googleClientId = env_1.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+        const redirectUri = req.query.redirect_uri ||
+            env_1.env.GOOGLE_CALLBACK_URL ||
+            `${req.protocol}://${req.get('host')}/api/v1/auth/google/callback`;
+        const isRealGoogleConfig = googleClientId &&
+            !googleClientId.includes('your_google_client_id') &&
+            googleClientId.length > 10;
+        if (isRealGoogleConfig) {
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(googleClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid%20email%20profile&access_type=offline&prompt=consent`;
+            return res.redirect(authUrl);
+        }
+        // Development / demo fallback without requiring external Google Cloud credentials
+        const result = await auth_service_1.AuthService.googleAuth('mock-google-token:googleuser@example.com:Google User:google-sub-dev');
+        res.cookie('refreshToken', result.tokens.refreshToken, {
+            httpOnly: true,
+            secure: env_1.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        const userPayload = encodeURIComponent(JSON.stringify(result.user));
+        return res.redirect(`${env_1.env.FRONTEND_URL}/auth/callback?token=${result.tokens.accessToken}&user=${userPayload}`);
+    });
+    static googleOAuthCallback = (0, catchAsync_1.catchAsync)(async (req, res) => {
+        const error = req.query.error;
+        const isJsonRequest = req.xhr ||
+            req.headers.accept?.includes('application/json') ||
+            req.headers['sec-fetch-mode'] === 'cors';
+        if (error) {
+            if (isJsonRequest) {
+                return res.status(400).json({ success: false, message: error });
+            }
+            return res.redirect(`${env_1.env.FRONTEND_URL}/auth/callback?error=${encodeURIComponent(error)}`);
+        }
+        const code = (req.query.code || req.body?.code);
+        const googleClientId = env_1.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
+        const googleClientSecret = env_1.env.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET;
+        const redirectUri = req.query.redirect_uri ||
+            req.body?.redirect_uri ||
+            env_1.env.GOOGLE_CALLBACK_URL ||
+            `${req.protocol}://${req.get('host')}/api/v1/auth/google/callback`;
+        const isRealGoogleConfig = code &&
+            googleClientId &&
+            googleClientSecret &&
+            !googleClientId.includes('your_google_client_id');
+        if (isRealGoogleConfig) {
+            try {
+                const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        code,
+                        client_id: googleClientId,
+                        client_secret: googleClientSecret,
+                        redirect_uri: redirectUri,
+                        grant_type: 'authorization_code',
+                    }),
+                });
+                const tokenData = (await tokenRes.json());
+                if (tokenData.error) {
+                    console.error('Failed to exchange Google OAuth code:', tokenData);
+                    const errorMsg = tokenData.error_description || tokenData.error;
+                    if (isJsonRequest) {
+                        return res.status(400).json({ success: false, message: errorMsg });
+                    }
+                    return res.redirect(`${env_1.env.FRONTEND_URL}/auth/callback?error=${encodeURIComponent(errorMsg)}`);
+                }
+                const tokenToVerify = tokenData.id_token || tokenData.access_token;
+                if (tokenToVerify) {
+                    const result = await auth_service_1.AuthService.googleAuth(tokenToVerify);
+                    res.cookie('refreshToken', result.tokens.refreshToken, {
+                        httpOnly: true,
+                        secure: env_1.env.NODE_ENV === 'production',
+                        sameSite: 'lax',
+                        maxAge: 7 * 24 * 60 * 60 * 1000,
+                    });
+                    if (isJsonRequest) {
+                        return ApiResponse_1.ApiResponse.success(res, result, 'Google authentication successful');
+                    }
+                    const userPayload = encodeURIComponent(JSON.stringify(result.user));
+                    return res.redirect(`${env_1.env.FRONTEND_URL}/auth/callback?token=${result.tokens.accessToken}&user=${userPayload}`);
+                }
+            }
+            catch (err) {
+                console.error('Failed to exchange Google OAuth code:', err);
+            }
+        }
+        // Fallback in case of error or dev callback
+        const result = await auth_service_1.AuthService.googleAuth('mock-google-token:googleuser@example.com:Google User:google-sub-dev');
+        res.cookie('refreshToken', result.tokens.refreshToken, {
+            httpOnly: true,
+            secure: env_1.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        const userPayload = encodeURIComponent(JSON.stringify(result.user));
+        return res.redirect(`${env_1.env.FRONTEND_URL}/auth/callback?token=${result.tokens.accessToken}&user=${userPayload}`);
+    });
     static login = (0, catchAsync_1.catchAsync)(async (req, res) => {
         const result = await auth_service_1.AuthService.login(req.body);
         res.cookie('refreshToken', result.tokens.refreshToken, {

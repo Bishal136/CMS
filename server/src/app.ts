@@ -19,6 +19,7 @@ export function createApp(): Application {
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow static uploads to load in client
+      crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }, // Allow Google OAuth and auth popups
     })
   );
 

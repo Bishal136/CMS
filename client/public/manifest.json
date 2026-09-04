@@ -1,0 +1,15 @@
+{
+  "short_name": "CMS",
+  "name": "CMS Social Media Management",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FF1493",
+  "display": "standalone"
+}
