@@ -6,16 +6,17 @@ const otp_service_1 = require("../services/otp.service");
 const ApiResponse_1 = require("../utils/ApiResponse");
 const catchAsync_1 = require("../utils/catchAsync");
 const env_1 = require("../config/env");
+const getRefreshTokenCookieOptions = () => ({
+    httpOnly: true,
+    secure: env_1.env.NODE_ENV === 'production',
+    sameSite: env_1.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+});
 class AuthController {
     static register = (0, catchAsync_1.catchAsync)(async (req, res) => {
         const result = await auth_service_1.AuthService.register(req.body);
         // Set refresh token cookie (httpOnly, 7 days)
-        res.cookie('refreshToken', result.tokens.refreshToken, {
-            httpOnly: true,
-            secure: env_1.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
         return ApiResponse_1.ApiResponse.created(res, result, 'Registration successful');
     });
     static sendOtp = (0, catchAsync_1.catchAsync)(async (req, res) => {
@@ -25,23 +26,13 @@ class AuthController {
     });
     static registerWithOtp = (0, catchAsync_1.catchAsync)(async (req, res) => {
         const result = await auth_service_1.AuthService.registerWithOtp(req.body);
-        res.cookie('refreshToken', result.tokens.refreshToken, {
-            httpOnly: true,
-            secure: env_1.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
         return ApiResponse_1.ApiResponse.created(res, result, 'Registration with OTP successful');
     });
     static googleLogin = (0, catchAsync_1.catchAsync)(async (req, res) => {
         const token = req.body.idToken || req.body.credential;
         const result = await auth_service_1.AuthService.googleAuth(token);
-        res.cookie('refreshToken', result.tokens.refreshToken, {
-            httpOnly: true,
-            secure: env_1.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
         return ApiResponse_1.ApiResponse.success(res, result, 'Google authentication successful');
     });
     static googleOAuthRedirect = (0, catchAsync_1.catchAsync)(async (req, res) => {
@@ -58,12 +49,7 @@ class AuthController {
         }
         // Development / demo fallback without requiring external Google Cloud credentials
         const result = await auth_service_1.AuthService.googleAuth('mock-google-token:googleuser@example.com:Google User:google-sub-dev');
-        res.cookie('refreshToken', result.tokens.refreshToken, {
-            httpOnly: true,
-            secure: env_1.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
         const userPayload = encodeURIComponent(JSON.stringify(result.user));
         return res.redirect(`${env_1.env.FRONTEND_URL}/auth/callback?token=${result.tokens.accessToken}&user=${userPayload}`);
     });
@@ -114,12 +100,7 @@ class AuthController {
                 const tokenToVerify = tokenData.id_token || tokenData.access_token;
                 if (tokenToVerify) {
                     const result = await auth_service_1.AuthService.googleAuth(tokenToVerify);
-                    res.cookie('refreshToken', result.tokens.refreshToken, {
-                        httpOnly: true,
-                        secure: env_1.env.NODE_ENV === 'production',
-                        sameSite: 'lax',
-                        maxAge: 7 * 24 * 60 * 60 * 1000,
-                    });
+                    res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
                     if (isJsonRequest) {
                         return ApiResponse_1.ApiResponse.success(res, result, 'Google authentication successful');
                     }
@@ -133,40 +114,26 @@ class AuthController {
         }
         // Fallback in case of error or dev callback
         const result = await auth_service_1.AuthService.googleAuth('mock-google-token:googleuser@example.com:Google User:google-sub-dev');
-        res.cookie('refreshToken', result.tokens.refreshToken, {
-            httpOnly: true,
-            secure: env_1.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
         const userPayload = encodeURIComponent(JSON.stringify(result.user));
         return res.redirect(`${env_1.env.FRONTEND_URL}/auth/callback?token=${result.tokens.accessToken}&user=${userPayload}`);
     });
     static login = (0, catchAsync_1.catchAsync)(async (req, res) => {
         const result = await auth_service_1.AuthService.login(req.body);
-        res.cookie('refreshToken', result.tokens.refreshToken, {
-            httpOnly: true,
-            secure: env_1.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
         return ApiResponse_1.ApiResponse.success(res, result, 'Login successful');
     });
     static refreshToken = (0, catchAsync_1.catchAsync)(async (req, res) => {
         const token = req.cookies?.refreshToken || req.body?.refreshToken;
         const tokens = await auth_service_1.AuthService.refreshTokens(token);
-        res.cookie('refreshToken', tokens.refreshToken, {
-            httpOnly: true,
-            secure: env_1.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie('refreshToken', tokens.refreshToken, getRefreshTokenCookieOptions());
         return ApiResponse_1.ApiResponse.success(res, tokens, 'Token refreshed successfully');
     });
     static logout = (0, catchAsync_1.catchAsync)(async (req, res) => {
         const token = req.cookies?.refreshToken || req.body?.refreshToken;
         await auth_service_1.AuthService.logout(token);
-        res.clearCookie('refreshToken');
+        const { maxAge, ...clearOptions } = getRefreshTokenCookieOptions();
+        res.clearCookie('refreshToken', clearOptions);
         return ApiResponse_1.ApiResponse.success(res, null, 'Logged out successfully');
     });
     static forgotPassword = (0, catchAsync_1.catchAsync)(async (req, res) => {

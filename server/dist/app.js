@@ -18,6 +18,8 @@ const error_middleware_1 = require("./middleware/error.middleware");
 const routes_1 = __importDefault(require("./routes"));
 function createApp() {
     const app = (0, express_1.default)();
+    // Trust reverse proxy (Render, AWS, Heroku, Nginx)
+    app.set('trust proxy', 1);
     // 1. Security HTTP headers
     app.use((0, helmet_1.default)({
         crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow static uploads to load in client

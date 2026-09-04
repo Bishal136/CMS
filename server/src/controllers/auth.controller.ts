@@ -1,21 +1,23 @@
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 import { OtpService } from '../services/otp.service';
 import { ApiResponse } from '../utils/ApiResponse';
 import { catchAsync } from '../utils/catchAsync';
 import { env } from '../config/env';
 
+const getRefreshTokenCookieOptions = (): CookieOptions => ({
+  httpOnly: true,
+  secure: env.NODE_ENV === 'production',
+  sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
 export class AuthController {
   static register = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.register(req.body);
 
     // Set refresh token cookie (httpOnly, 7 days)
-    res.cookie('refreshToken', result.tokens.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
 
     return ApiResponse.created(res, result, 'Registration successful');
   });
@@ -29,12 +31,7 @@ export class AuthController {
   static registerWithOtp = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.registerWithOtp(req.body);
 
-    res.cookie('refreshToken', result.tokens.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
 
     return ApiResponse.created(res, result, 'Registration with OTP successful');
   });
@@ -43,12 +40,7 @@ export class AuthController {
     const token = req.body.idToken || req.body.credential;
     const result = await AuthService.googleAuth(token);
 
-    res.cookie('refreshToken', result.tokens.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
 
     return ApiResponse.success(res, result, 'Google authentication successful');
   });
@@ -79,12 +71,7 @@ export class AuthController {
       'mock-google-token:googleuser@example.com:Google User:google-sub-dev'
     );
 
-    res.cookie('refreshToken', result.tokens.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
 
     const userPayload = encodeURIComponent(JSON.stringify(result.user));
     return res.redirect(
@@ -159,12 +146,7 @@ export class AuthController {
         if (tokenToVerify) {
           const result = await AuthService.googleAuth(tokenToVerify);
 
-          res.cookie('refreshToken', result.tokens.refreshToken, {
-            httpOnly: true,
-            secure: env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-          });
+          res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
 
           if (isJsonRequest) {
             return ApiResponse.success(res, result, 'Google authentication successful');
@@ -184,12 +166,7 @@ export class AuthController {
     const result = await AuthService.googleAuth(
       'mock-google-token:googleuser@example.com:Google User:google-sub-dev'
     );
-    res.cookie('refreshToken', result.tokens.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
 
     const userPayload = encodeURIComponent(JSON.stringify(result.user));
     return res.redirect(
@@ -200,12 +177,7 @@ export class AuthController {
   static login = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.login(req.body);
 
-    res.cookie('refreshToken', result.tokens.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('refreshToken', result.tokens.refreshToken, getRefreshTokenCookieOptions());
 
     return ApiResponse.success(res, result, 'Login successful');
   });
@@ -214,12 +186,7 @@ export class AuthController {
     const token = req.cookies?.refreshToken || req.body?.refreshToken;
     const tokens = await AuthService.refreshTokens(token);
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('refreshToken', tokens.refreshToken, getRefreshTokenCookieOptions());
 
     return ApiResponse.success(res, tokens, 'Token refreshed successfully');
   });
@@ -228,7 +195,8 @@ export class AuthController {
     const token = req.cookies?.refreshToken || req.body?.refreshToken;
     await AuthService.logout(token);
 
-    res.clearCookie('refreshToken');
+    const { maxAge, ...clearOptions } = getRefreshTokenCookieOptions();
+    res.clearCookie('refreshToken', clearOptions);
     return ApiResponse.success(res, null, 'Logged out successfully');
   });
 

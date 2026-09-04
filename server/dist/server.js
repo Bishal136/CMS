@@ -16,8 +16,8 @@ async function startServer() {
     // 3. Create HTTP Server & attach Socket.IO
     const httpServer = http_1.default.createServer(app);
     (0, socket_1.initializeSocket)(httpServer);
-    // 4. Start listening
-    const server = httpServer.listen(env_1.env.PORT, () => {
+    // 4. Start listening (bind explicitly to 0.0.0.0 for cloud hosts like Render)
+    const server = httpServer.listen(env_1.env.PORT, '0.0.0.0', () => {
         console.log(`
 🚀 ====================================================
    CMS Management Server is running!
@@ -55,6 +55,13 @@ async function startServer() {
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     process.on('SIGINT', () => shutdown('SIGINT'));
 }
+process.on('uncaughtException', (err) => {
+    console.error('💥 Uncaught Exception:', err);
+    process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+    console.error('💥 Unhandled Rejection:', reason);
+});
 startServer().catch((error) => {
     console.error('Fatal server startup error:', error);
     process.exit(1);

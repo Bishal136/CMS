@@ -15,6 +15,9 @@ import apiRouter from './routes';
 export function createApp(): Application {
   const app = express();
 
+  // Trust reverse proxy (Render, AWS, Heroku, Nginx)
+  app.set('trust proxy', 1);
+
   // 1. Security HTTP headers
   app.use(
     helmet({
